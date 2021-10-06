@@ -336,7 +336,8 @@ not every natural number is equal to zero.
 lemma not_all_nats_are_zero : (∀ (n : ℕ), n = 0) → false :=
 begin
   assume h,
-  /--/
+  /-
+  -/
 end 
 
 -- 11. equivalence of P→Q and (¬P∨Q)
