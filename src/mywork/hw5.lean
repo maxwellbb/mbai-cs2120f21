@@ -64,14 +64,28 @@ begin
   assume h,
   assume i,
   
-  cases h with hf h,
+  cases h with hf hp,
   cases i with alpha pa,
 
-  have f := h alpha,
+  have f := hp alpha,
   have j := f pa,
 
-  have beta := hf alpha,
-  apply exists.intro beta,
+  apply exists.intro (hf alpha),
+  exact j,
 end
   
-
+/-
+informal proof:
+we start by assuming our premise. then we 
+take our assumption of our function and
+obtain a name for our function and a proof
+of what our function does. then we take α
+and name it, and obtain a proof of predicate
+p on α. from our proof that p a → q (hf a)
+we can use our alpha as a witness, and from 
+there it follows that we have a proof of 
+q (hf alpha). finally we can use (hf alpha)
+as a witness to the proposition we are trying
+to prove, and since we have a proof of 
+q (hf alpha), we are done.
+-/
