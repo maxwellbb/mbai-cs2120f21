@@ -1,48 +1,76 @@
-import .lecture_22
-import data.set
+import .lecture_23 
 
 /-
-ADDITIONAL PROPERTIES OF RELATIONS
+UNIVERSAL QUANTIFICATION OVER AN EMPTY SET IS TRUE
+
+Let's review the most puzzling of the examples from
+last time: a relation r = {(0,1), (2,3)} we said is
+transitive because it satisfies the constraint that
+defines transitivity: for every x, y, and x, if (x,y)
+is in r, and (y,z) is in r, then (x,z) is in r. This
+relation is transitive because in *every* case where
+we have (x, y) and (y, z) in r, (x, z) is in r. In
+this example, there are *no* such cases, and so the
+predicate is satisfied!
+
+Let's think about this principle using a different
+example. Question: is every ball in an empty bucket
+of balls red?
 -/
 
-namespace relations
+axioms (Ball : Type) (red : Ball → Prop)
+def empty_bucket := ({} : set Ball)
+lemma  allBallsInEmptyBucketAreRed : 
+  ∀ (b : Ball), b ∈ empty_bucket → red b := 
+begin
+  assume b h,
+  _             -- finish off this proof
+end
 
-section relation
-
-/-
-Define relation, r, as two-place predicate on 
-a type, β, with notation, x ≺ y, for (r x y). 
--/
-variables {α β : Type}  (r : β → β → Prop)
-local infix `≺`:50 := r  
-
--- special relations on an arbitrary type, α 
-def empty_relation := λ a₁ a₂ : α, false
-def full_relation := λ a₁ a₂ : α, true
-def id_relation :=  λ a₁ a₂ : α, a₁ = a₂ 
-
--- Analog of the subset relation but now on binary relations
--- Note: subrelation is a binary relation on binary relations
-def subrelation (q r : β → β → Prop) := ∀ ⦃x y⦄, q x y → r x y
-
-/-
-Additional properties of relations
--/
-
-def total := ∀ x y, x ≺ y ∨ y ≺ x
-/-
-Note: we will use "total" later to refer to a different
-property of relations that also satisfy the constraints
-needed to be "functions."  
+/- 
+Whoa, ok. That's a little bit counterintuitive, but
+it's correct. A universal quantification over an empty
+set is always trivially true. Here's another way to 
+think about it. Suppose we had a set with two balls
+in it: { b1, b2 }. To show that every ball is red,
+we'd show that b1 is red, AND (∧) that all balls in 
+the remaining set, { b2 }, are red. To prove the 
+latter, we'd show that b2 is red, and that all balls
+in the remaining set, {}, are red. So we have that
+all balls are red if (red b1) ∧ (red b2) ∧ "all balls
+in {} are red". If b1 and b2 really are red, then
+that last predicate better be true if the whole chain
+of ∧ operations are to be true. When you think about
+∀ as a version of ∧ that can take any number of
+arguments, not just 2, it becomes clear that when
+applied to zero arguments, the answer better be true,
+otherwise this operation would *always* return false.  
 -/
 
-def anti_reflexive := ∀ x, ¬ x ≺ x
-def irreflexive := anti_reflexive r -- sometimes used
-def anti_symmetric := ∀ ⦃x y⦄, x ≺ y → y ≺ x → x = y
-def asymmetric := ∀ ⦃x y⦄, x ≺ y → ¬ y ≺ x
+/-
+So now let's revisit once again our funny example of
+transitivity: { (0,1), (2,3) }. There are no cases 
+here where we have both (x,y) and (y,z) as pairs in
+this relation, so there are no cases to consider, so
+the transitivity property holds by the definition of
+∀ (and for ∧, if you want to think of ∀ as a multi-
+argument version of ∧, taking anywhere from zero to
+an infinite number of arguments).
+
+Question: Is this symmetric? {(0,1), (1,0), (2,2)}
+How about this: {(0,1), (1,0), (2,2)}?
+
+Now suppose that we have a relation, r, over a set
+of values, {0, 1, 2, 3, 4, 5}. Is this relation
+reflexive? {}
+
+Question: If a relation is transitive and symmetric
+is it necessarily reflexive? If so, give an informal
+argument/proof. If not, give a counter-example. 
+-/
 
 /-
-CLOSURE operations on relations.
+CLOSURE OPERATIONS ON RELATIONS
 
 Given a relation, r, the reflexive, symmetric, or
 transitive closure of r is the smallest relation that
@@ -141,48 +169,48 @@ The higher-order predicate logic of Lean and similar
 modern proof assistants is strictly more expressive.
 -/
 
-/-
 
+/-
+ORDERING RELATIONS
+-/
+
+namespace relations
+
+section relation
+
+/-
+Define relation, r, as two-place predicate on 
+a type, β, with notation, x ≺ y, for (r x y). 
+-/
+variables {α β : Type}  (r : β → β → Prop)
+local infix `≺`:50 := r  
+
+/-
+-/
+def strict_ordering :=  asymmetric r ∧ transitive r
+def ordering :=         reflexive r ∧ anti_symmetric r ∧ transitive r
+def partial_order :=    reflexive r ∧ anti_symmetric r ∧ transitive r ∧ ¬ total r
+def total_order :=      reflexive r ∧ anti_symmetric r ∧ transitive r ∧ total r
+
+/-
+Exercise: We started our discussion of properties of binary relations on 
+values of a type, β, with the case of what it means for such a relation to
+be total: that every pair of objects is related at least in one direction
+or the other. Think of this as saying that any two objects are comparable.
+In the less-or-equal relation on natural numbers, you can compare any pair
+of natural numbers. The subset inclusion relation, on the other hand, is
+not total. It is said to be partial. 
+
+Consider the subset relation on the powerset of {0, 1}, that is, on the
+sets {0, 1}, {0}, {1}, {}. The subset relation is not total. Its elements
+are ({},{}), ({}, {0}), ({}, {1}), ({}, {0,1}), ({0}, {0}), ({0}, {0,1}),
+({1}, {0,1}) ({0,1}, {0,1})}
+-/
+
+/-
+Definitions vary subtly. Be sure you know what is meant by these terms in any
+given setting or application.
 -/
 
 end relation
 end relations
-
-/-
-Problem #1: Formally prove and give an English
-language proof of the proposition that the identity
-relation, on objects of an arbitrary type, β, is a
-subrelation of any equivalence relation on β. 
--/
-
-example : ∀ (β : Type) (r : β → β → Prop),
-  equivalence r → subrelation relations.id_relation r := 
-begin
-  unfold equivalence subrelation reflexive relations.id_relation,
-  assume β r h x y k,
-  cases h with refl rest,
-  rw <-k,
-  exact refl x,
-end
-
-/-
-Suppose r is a equivalence relation. To show that the
-identity relation is a subrelation of r, we have to show
-that for any pair, (x, y), in the identity relation, that
-same pair is in r. Of course the identity relation has 
-all and only the pairs of the form, (x, x), so all we 
-need to show is that any such pair is also in r. But r
-is reflexive, so by definition, for any x, (x, x) ∈ r. 
-So (x,y) ∈ id_relation → (x, x) ∈ r. And that is what
-it means for the identity relation to be a subrelation
-of r. As r was arbitrary, the identity relation is a
-subrelation of *any* equivalence relation on r. QED.
--/
-
-/-
-Prove that the ⊆ relation on sets of objects of any
-type β is anti_symmetric (formally and informally).
--/
-
-example : ∀ (β : Type), ⊆  
-
