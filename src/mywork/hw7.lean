@@ -203,7 +203,33 @@ begin
 end
 
 example : transitive r → ¬ symmetric r → ¬ irreflexive r :=
+_
 
+/- #4
+Prove the following propositions. Remember that
+throughout this file, each definition implicitly
+includes β as a type and r as an arbitrary binary 
+relation on β. In addition to formal proofs, give
+an English language proof of the last of the three
+problems.
+-/
+
+-- A
+example : asymmetric r → irreflexive r :=
+begin
+  unfold asymmetric irreflexive,
+  
+end
+
+-- B
+example : irreflexive r → transitive r → asymmetric r :=
+begin
+end
+
+-- C
+example : transitive r → ¬ symmetric r → ¬ irreflexive r :=
+begin
+end
 
 
 end relation
