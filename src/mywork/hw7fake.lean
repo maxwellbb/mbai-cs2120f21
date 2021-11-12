@@ -1,40 +1,19 @@
-import data.set
-import tactic.ring
+import ..instructor.lectures.lecture_23
 
 namespace relation
 
--- PRELIMINARY SETUP
-
 /-
-Preliminary set up. For the rest of this file,
-we specify an arbitrary binary relation, r, on
-an arbitrary type, β, as a two-place predicate, 
-with infix notation x ≺ y for (r x y). One can
-pronounce these expressions in English as "x is
-related to y".
+Define relation, r, as two-place predicate on 
+a type, β, with notation, x ≺ y, for (r x y). 
 -/
 variables {α β : Type}  (r : β → β → Prop)
-local infix `≺` : 50 := r  
-
-
-/-
-The default Lean libraries are missing definitions
-for the assympetric property of relations and for
-the notion of a powerset. We define these terms for
-use in the rest of this file.
--/
+local infix `≺`:50 := r  
+-- Strangely Lean's library does define asymmetric, so here it is.
 def asymmetric := ∀ ⦃x y⦄, x ≺ y → ¬ y ≺ x
-def powerset (s : set β) := { s' | s' ⊆ s}
 
 
--- PROBLEMS
 
-/- 
-#1: Give both a formal and an English-language proof. Then
-answer the question, is the proposition true if you remove
-the first condition, that β is inhabited? Briefly explain
-your answer (in English).
--/
+-- Prove both formally and in English.
 example : (∃ (b : β), true) → asymmetric r → ¬reflexive r :=
 begin
   unfold asymmetric reflexive,
@@ -60,22 +39,16 @@ using rbb as a witness. Then, because we have both r b b and
 ¬r b b, we have a contradiction. QED.
 -/
 
+
 /-
-#2. Logic, like programming, is subtle. It's very easy for humans
+Logic, like programming, is subtle. It's very easy for humans
 to miss subtle corner cases. As an example, today I ran across
 a problem in a textbook by Paul Traiger, a professor emeritus
 of philosophy and cognitive science at Occidental College. He
 asks students to prove that if a relation is both transitive and 
-reflexive that it cannot be anti-symmetric. See the question at
-the very bottom of the page here:
+reflexive that it cannot be anti-symmetric. Is it actually true?
+If not, what condition needs to be added to make it true? See
 https://sites.oxy.edu/traiger/logic/exercises/chapter13/properties_of_relations_exercise.html
-
-Is the conjecture actually logically valid? If not, what condition 
-needs to be added to make it so? Try prove this/his version of the
-conjecture, as articulated slightly differently below. If you get
-stuck, then you need to figure out an additional condition that needs 
-to be added as a premise to make the proposition true. In that case,
-add the premise and then show that the updated conjecture is true.
 -/
 example : (∃ (b : β), true) → transitive r → reflexive r → ¬ asymmetric r :=
 begin
@@ -90,7 +63,6 @@ begin
 end
 
 /-
-ENGLISH:
 we first assume b of type β exists. we assume relation r is both
 transitive and reflexive. then, we assume it is asymmetric, and
 by proving this false we can show that it cannot be asymmetric.
@@ -101,23 +73,14 @@ that ¬r b b, which creates a contradiction. QED.
 -/
 
 /-
-the premise we needed to add to make the proposition true was
-that we needed some b of type β to exist.
-
-we first assume b of type β exists. we assume relation r is both
-transitive and reflexive. then, we assume it is asymmetric, and
-by proving this false we can show that it cannot be asymmetric.
-taking our b, we can generate a proof that r b b since we know 
-relation r is reflexive. we have assumed that the relation is
-asymmetric, so we can take our proof of r b b and create a proof
-that ¬r b b, which creates a contradiction. QED.
+State and prove that the subset relation on the powerset of any
+set, s, is antisymmetric. Formally state and prove, and then give
+an informal proof, of this proposition. You may use the following
+formal definition of the powerset of a given set, s. 
 -/
 
-/-
-#3: Prove that the subset relation on the powerset of any
-set, s, is antisymmetric. Formally state and prove, and
-then give an informal proof of, this proposition.
--/
+def powerset (s : set β) := { s' | s' ⊆ s}
+
 example : ∀ (s : set β) 
             (s1 s2 ∈ powerset s), 
             s1 ⊆ s2 → 
@@ -140,7 +103,6 @@ begin
 end
 
 /-
-ENGLISH:
 first we assume that s is an arbitrary set with elements of type β.
 then we assume that s1 and s2 are subsets of s, and that s1 is a
 subset of s2 and vice versa. to prove that s1 = s2...
@@ -156,19 +118,19 @@ Given two natural numbers, n and m, we will say that m divides n
 if there is a natural number, k, such that n = k*m. Here's a formal
 definition of this relation.
 -/
+
 def divides (m n : ℕ) := ∃ k, n = k * m
 
-
 /- 
-#4: Formally and informally state and prove each of the following
-propositions. Remember that the ring tactic is useful for producing
-proofs of simple algebraic equalities involving + and *. You can use
-the phrase, "by basic algebra" when translating the use of this tactic
-into English. (Or if you wanted to be truly Hobbit-like you could say 
-"by the ring axioms!")
+#3: Formally state and prove each of the following propositions.
+Remember that the ring tactic is useful for producing proofs of
+algebraic equalities involving + and *. You can use the phrase,
+"by basic algebra" when translating the use of this tactic into
+English.
 -/
 
--- A: For any n, 1 divides n.
+-- 3a: For any n, 1 divides n.
+
 example : ∀ n, divides 1 n :=
 begin
   assume n,
@@ -178,14 +140,14 @@ begin
 end
 
 /-
-ENGLISH:
 first we assume an arbitrary natural number n. saying divides 1 n
 means that there exists some k s.t. n = k * 1. if we use the
 exists intro rule to replace k with n, we show that n = n * 1. by
 basic algebra, our proposition is shown to be true.
 -/
 
--- B. For any n, n divides n
+-- 3b. For any n, n divides n
+
 example : ∀ n, divides n n :=
 begin
   assume n,
@@ -195,14 +157,14 @@ begin
 end
 
 /-
-ENGLISH:
 first we assume an arbitrary natural number n. saying divides n n
 means that there exists some k s.t. n = k * n. if we use the
 exists intro rule to replace k with 1, we show that n = 1 * n. by
 basic algebra, our proposition is shown to be true.
 -/
 
--- #C. prove that divides is reflexive 
+-- #3c. divides is reflexive (use our reflexive predicate)
+
 example : reflexive divides :=
 begin
   unfold reflexive divides,
@@ -212,7 +174,6 @@ begin
 end 
 
 /-
-ENGLISH:
 the proposition that divides is reflexive means that for every 
 natural number x, there exists a natural number k such that
 x = k * x. we first assume x is any arbitrary natural number.
@@ -221,80 +182,77 @@ k for 1, and we show that x = 1 * x. by basic algebra, our
 proposition is shown to be true.
 -/
 
--- #D. prove that divides is transitive
-example : transitive divides :=
-begin
-  unfold transitive divides,
-  assume x y z,
-  assume xdvy ydvz,
+-- #3d. divides is transitive
 
-  cases xdvy with k1 xypf,
-  cases ydvz with k2 yzpf,
+example : ∀ h n k, divides h n → divides n k → divides h k :=
+begin
+  assume h n k,
+  unfold divides,
+
+  assume hdvn ndvk,
+  cases hdvn with k1 pf1,
+  cases ndvk with k2 pf2,
 
   apply exists.intro (k1 * k2),
-  rw yzpf,
-  rw xypf,
+  rw pf2,
+  rw pf1,
   ring,
 end 
 
 /-
-ENGLISH:
-assuming that x, y, and z are arbitrary natural numbers...
-we take the fact that divides x y to name a natural number k1
-such that y = k1 * x. and similarly for divides y z, we have
-a k2 such that z = k2 * y. we have to prove divides x z, which
-means that there exists a k_1 such that z = k_1 * x. by using
+assuming that h, n, and k are arbitrary natural numbers...
+we take the fact that divides h n to name a natural number k1
+such that n = k1 * h. and similarly for divides n k, we have
+a k2 such that k = k2 * n. we have to prove divides h k, which
+means that there exists a k_1 such that k = k_1 * h. by using
 exists.intro, we can substitute our k_1 to be k1 * k2. rewriting
-our proposition, we can take z = k1 * k2 * x and turn it into
-k2 * y = k1 * k2 * x since z = k2 * y. and y = k1 * x, so we get
-k2 * (k1 * x) = k1 * k2 * x. and by basic algebra, we can prove
+our proposition, we can take k = k1 * k2 * h and turn it into
+k2 * n = k1 * k2 * h since k = k2 * n. and n = k1 * h, so we get
+k2 * (k1 * h) = k1 * k2 * h. and by basic algebra, we can prove
 this to be true. QED.
 -/
 
 /- 
-E. Is divides symmetric? if yes, give a proof, otherwise 
+#3d. is divides symmetric? if yes, give a proof, otherwise 
 give a counterexample and a brief explanation to show that 
 it's not.
 -/
 
 /-
-ANSWER:
 divides is not symmetric. if a number x divides a number y,
-y does not necessarily divide x, only unless x = y. this
-shows that divides is not symmetric.
+y does not necessarily divide x, UNLESS x = y. this shows
+that divides is not symmetric and not antisymmetric either.
 
 counterex: 10 / 1 != 1 / 10
 -/
 
 /- 
-#F. Prove that divides is antisymmetric. 
+#3e. Prove that divides is antisymmetric. Use the
+anti_symmetric predicate to state the proposition
+formally.
 -/
-example : anti_symmetric divides := 
+example : relations.anti_symmetric divides := 
 begin
-  unfold anti_symmetric,
-  assume x y,
-  assume xdvy ydvx,
-  
-  cases xdvy with kxy xypf,
-  cases ydvx with kyx yxpf,
-
-  rw yxpf at xypf,
+  unfold relations.anti_symmetric divides,
+  assume x y kx ky,
+  cases kx with kxv kxpf,
+  cases ky with kyv kypf,
+  rw kxpf at kypf,
+  /-
+  From kypf we can deduce by basic algebra
+  that kyv = kxv = 1, and the rewriting kxv
+  as 1 in kxpf, we get that y = x. The proof
+  of the conclusion then follows by symmetry
+  of equality. We don't yet quite have the
+  tools to reason formally to the conlusion
+  that kxv and kyv are both one, so we'll 
+  just admit it as an axiom for now, using
+  sorry to remind us to come back and visit
+  this point again when we're equipped to 
+  polish off the formal proof.
+  -/
   sorry,
 end
-
-/-
-ENGLISH:
-we assume x and y are arbitrary natural numbers. we assume
-x divides y and y divides x. from our proofs of both we can
-extract natural numbers kxy and kyx such that y = kxy * x
-and x = kyx * y. by rewriting y = kxy * x with xypf, we get
-y = kxy * (kyx * y). don't know how to formally prove the rest
-here but... we know kxy * kyx must equal 1, and through
-basic algebra we can deduce that kxy * kyx = kxy = kyx = 1.
-then by rewriting y = kxy * x to y = 1 * x, through basic
-algebra we have shown that y = x. because equality has
-the property of symmetry it follows that x = y. 
--/
 
 /- #4
 Prove the following propositions. Remember that
@@ -316,7 +274,6 @@ begin
 end
 
 /-
-ENGLISH:
 we first assume our relation r on β is asymmetric.
 we then assume x to be an arbitrary object of type β. 
 then we assume r x x is false to prove ¬r x x. by 
@@ -338,7 +295,6 @@ begin
 end
 
 /-
-ENGLISH:
 we first assume our relation r is irreflexive and transitive.
 we then assume x and y are both arbitrary objects of type β.
 to prove that the relation is asymmetric, we prove that
@@ -353,11 +309,13 @@ proving symmetry to be false. QED.
 -- C
 example : transitive r → ¬ symmetric r → ¬ irreflexive r :=
 begin
+  unfold transitive symmetric irreflexive,
+  assume trans symm refl,
+  _
   -- impossible to solve
 end
 
 /-
-ENGLISH:
 cannot be solved because we need to assume some b of type β
 exists in order to prove this proposition.
 -/
