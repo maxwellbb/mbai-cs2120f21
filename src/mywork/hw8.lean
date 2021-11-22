@@ -195,6 +195,7 @@ begin
   unfold total_function at tfr,
 
   assume h,
+  have dx := defall x,
   
 end
 
@@ -434,8 +435,82 @@ def bijectivep := function r ∧ bijective (dom_res r (dom_of_def r))
 -- #2: Prove that the inverse of a bijective function is bijective.
 example : bijective r → bijective (inverse r) :=
 begin
+  assume bij_r,
+
+  cases bij_r with surj_r inj_r,
+  cases surj_r with r_tot r_onto,
+  cases inj_r with r_tot r_oto,
+  cases r_tot with func_r def_all,
+  unfold function at func_r,
+  unfold single_valued at func_r,
+  unfold defined at def_all,
+
+  unfold bijective,
+  apply and.intro _ _,
+
+  unfold surjective,
+  apply and.intro _ _,
+  unfold total_function,
+  apply and.intro _ _,
+  
+  unfold function,
+  unfold single_valued,
+  assume x y z irxy irxz,
+  
+  unfold inverse at irxy irxz,
+  apply r_oto irxy irxz,
+
+  assume a,
+  unfold defined,
+  unfold inverse,
+  exact r_onto a,
+
+  assume b,
+  unfold inverse,
+  exact def_all b,
+
+  unfold injective,
+  apply and.intro _ _,
+
+  unfold total_function,
+  apply and.intro _ _,
+
+  unfold function,
+  unfold single_valued,
+  assume x y z irxy irxz,
+  unfold inverse at irxy irxz,
+  exact r_oto irxy irxz,
+
+  assume a,
+  unfold defined,
+  unfold inverse,
+  exact r_onto a,
+
+  assume x y z irxz iryz,
+  unfold inverse at irxz iryz,
+  exact func_r irxz iryz,
 end
 
+/-
+to prove that the inverse of r is bijective, we need to prove
+that the inverse of r is both surjective and injective. first,
+to prove that the inverse of r is surjective, we need to prove 
+it is total and is onto. to prove that it is total, first we
+show that it is a function. we first assume inverse r x y and
+inverse r x z (thus r y x and r z x) and since we know r maps
+one to one, this is true. we know that inverse r is defined for
+all (b : α) since r is onto. similarly, we know that inverse r
+is onto since r is defined ∀ (b : α).
+
+to prove injective-ness, we just need to prove that inverse r
+is one-to-one since we already know it is total. we also know
+that inverse r is in fact defined ∀ (a : β) since we know that
+r is onto. finally, we need to prove that inverse r is 1 to 1,
+∀ {x y : β} {z : α}, inverse r x z → inverse r y z → x = y...
+by assuming r z x and r z y, we can obtain a proof that x = y 
+since we know r is single-valued.
+QED.
+-/
 
 /-
 #3: Prove that the inverse of the inverse of a bijective
@@ -443,14 +518,32 @@ function is that function.
 -/
 example : bijective r → (r = inverse (inverse r)) :=
 begin
+  assume bij_r,
+  unfold inverse,
 end
+
+/-
+by definition, it is obvious that the inverse of the
+inverse of r is r.
+-/
 
 /-
 #4: Formally state and prove that every injective function 
 has a *function* as an inverse.
 -/
 example : injective r → function (inverse r) :=
-  _ -- hint: remember recent work
+begin
+  assume inj_r,
+  cases inj_r with tot_r oto_r,
+  cases tot_r with func_r defall,
+  
+  unfold function,
+  unfold single_valued,
+  assume x y z irxy irxz,
+  
+  unfold inverse at irxy irxz,
+  exact oto_r irxy irxz,
+end
 
 
 /-
@@ -468,7 +561,114 @@ False? Present a counterexample.
 -/
 def bij_trans (s : β → γ → Prop)  (r : α → β → Prop) :
   bijective r → bijective s → bijective (composition s r) := 
-  _
+begin
+  assume bij_r bij_s,
+  unfold bijective,
+
+  cases bij_r with surj_r inj_r,
+  cases surj_r with r_tot r_onto,
+  cases inj_r with r_tot r_oto,
+  cases r_tot with func_r defall_r,
+  unfold function at func_r,
+  unfold single_valued at func_r,
+  unfold defined at defall_r,
+
+  cases bij_s with surj_s inj_s,
+  cases surj_s with s_tot s_onto,
+  cases inj_s with s_tot s_oto,
+  cases s_tot with func_s defall_s,
+  unfold function at func_s,
+  unfold single_valued at func_s,
+  unfold defined at defall_s,
+
+  apply and.intro _ _,
+  unfold surjective,
+  apply and.intro _ _,
+
+  unfold total_function,
+  apply and.intro _ _,
+
+  unfold function,
+  unfold single_valued,
+  assume x y z csrxy csrxz,
+
+  unfold composition at csrxy csrxz,
+  cases csrxy with b1 csrxy,
+  cases csrxz with b2 csrxz,
+  cases csrxy with sby rxb1,
+  cases csrxz with sbz rxb2,
+  have bisb := func_r rxb1 rxb2,
+  rw bisb at sby,
+  exact func_s sby sbz,
+
+  unfold defined,
+  assume a,
+  unfold composition,
+  have rab := defall_r a,
+  cases rab with b rab,
+  have sbx := defall_s b,
+  cases sbx with x sbx,
+  apply exists.intro x,
+  apply exists.intro b,
+  apply and.intro _ _,
+  exact sbx,
+
+  exact rab,
+
+  assume b,
+  have sab := s_onto b,
+  cases sab with a sab,
+  have rxa := r_onto a,
+  cases rxa with x rxa,
+  apply exists.intro x,
+  unfold composition,
+  apply exists.intro a,
+  apply and.intro _ _,
+  exact sab,
+
+  exact rxa,
+
+  unfold injective,
+  apply and.intro _ _,
+  
+  unfold total_function,
+  apply and.intro _ _,
+
+  unfold function,
+  unfold single_valued,
+  assume x y z csrxy csrxz,
+  unfold composition at csrxy csrxz,
+  cases csrxy with b1 csrxy,
+  cases csrxz with b2 csrxz,
+  cases csrxy with sby rxb1,
+  cases csrxz with sbz rxb2,
+  have bisb := func_r rxb1 rxb2,
+  rw bisb at sby,
+  exact func_s sby sbz,
+
+  assume a,
+  unfold defined,
+  have rab := defall_r a,
+  cases rab with b rab,
+  have sbx := defall_s b,
+  cases sbx with x sbx,
+  apply exists.intro x,
+  apply exists.intro b,
+  apply and.intro _ _,
+  exact sbx,
+
+  exact rab,
+
+  assume x y z csrxz csryz,
+  unfold composition at csrxz csryz,
+  cases csryz with b1 csryz,
+  cases csrxz with b2 csrxz,
+  cases csryz with sb1z ryb,
+  cases csrxz with sb2z rxb,
+  have bisb := s_oto sb1z sb2z,
+  rw bisb at ryb,
+  exact r_oto rxb ryb,
+end
 
 /-
 In general, an operation (such as inverse, here) that, 
