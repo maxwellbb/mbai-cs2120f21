@@ -1,4 +1,4 @@
-import .lecture_26
+import ..instructor.lectures.lecture_26
 import data.set
 
 namespace relations
@@ -182,7 +182,20 @@ example :
   surjective r → 
   image_set r (dom r) = { b : β | true } :=
 begin
--- homework (on your own ungraded but please do it!)
+  assume surj_r,
+  cases surj_r with tfr defall,
+  unfold image_set,
+  unfold dom,
+  apply set.ext,
+  assume x,
+  split,
+
+  assume h,
+  unfold total_function at tfr,
+  unfold total_function at tfr,
+
+  assume h,
+  
 end
 
 /-
